@@ -1,3 +1,4 @@
+#include <set>
 #include "json.hpp"
 using nlohmann::json;
 
@@ -6,6 +7,8 @@ struct Edge {
     float capacity;
     float weight;
     std::vector<int> to;
+    std::map<float, std::set<int>> from;
+
 };
 
 void from_json(const json& j, Edge& e) {
@@ -17,7 +20,7 @@ void from_json(const json& j, Edge& e) {
 
 void to_json(json& j, const Edge& e) {
     j = json{
-            { "id", e.id,},
+            { "id", e.id},
             {"capacity", e.capacity},
             {"weight", e.weight},
             {"to", e.to}
