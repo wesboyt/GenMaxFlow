@@ -1,0 +1,6 @@
+[
+  {"id": 0, "to": [{"capacity":  1.0, "weight": 1.1,"to": 1},{"capacity":  0.7, "weight": 1.2, "to": 2}]},
+  {"id": 1, "to": [{"capacity":  0.7, "weight": 1.15, "to":  3}]},
+  {"id": 2, "to": [{"capacity":  0.3, "weight": 1.2, "to":  3}]},
+  {"id": 3, "to": []}
+]
