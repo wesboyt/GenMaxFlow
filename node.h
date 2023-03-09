@@ -11,6 +11,7 @@ struct Edge {
 
 void from_json(const json& j, Edge& e) {
     j.at("to").get_to(e.to);
+    //j.at("from").get_to(e.from);
     j.at("capacity").get_to(e.capacity);
     j.at("weight").get_to(e.weight);
 }

@@ -8,7 +8,7 @@ int main() {
     std::ifstream ifs("../nodes.json");
     json j = json::parse(ifs);
     std::vector<Node> es = j.get<std::vector<Node>>();
-    float maxFlow = flow(es);
+    float maxFlow = flow(es, 1.0);
     //json o;
     //o.emplace_back(es);
     std::cout << maxFlow << std::endl;
