@@ -29,6 +29,7 @@ struct Node {
     std::vector<Edge> to;
     std::map<float, std::vector<Edge*>> fromGains;
     std::set<int> from;
+    float currentGain;
 };
 
 void from_json(const json& j, Node& n) {

@@ -1,31 +1,24 @@
 #include <set>
 
-std::map<int,float> genGain(std::map<int, Node> *nodes, std::vector<std::set<int>> graph) {
-    std::map<int,float> gains;
-    for(auto node : (*nodes)) {
-        gains[node.first] = 0.0;
-    }
-    gains[0] = 1.0;
-
+void genGain(std::map<int, Node>& nodes, std::vector<std::set<int>> graph) {
     for(int i = 0; i < graph.size(); ++i) {
         for(int id : graph[i]) {
-            float gain = gains[id];
-            for(int i = 0; i < (*nodes)[id].to.size(); ++i) {
-                Edge edge = (*nodes)[id].to[i];
+            float gain = nodes[id].currentGain;
+            for(Edge& edge : nodes[id].to) {
+                Node& nextNode = nodes[edge.to];
                 float tempGain = gain * edge.weight;
-                float nextGain = gains[edge.to];
+                float nextGain = nextNode.currentGain;
                 if(tempGain > nextGain) {
-                    gains[edge.to] = tempGain;
+                    nextNode.currentGain = tempGain;
                 }
-                if((*nodes)[edge.to].fromGains.find(tempGain) != (*nodes)[edge.to].fromGains.end()) {
-                    (*nodes)[edge.to].fromGains[tempGain].emplace_back(&((*nodes)[id].to[i]));
+                if(nextNode.fromGains.find(tempGain) != nextNode.fromGains.end()) {
+                    nextNode.fromGains[tempGain].emplace_back(&edge);
                 } else {
-                    (*nodes)[edge.to].fromGains[tempGain] = {&((*nodes)[id].to[i])};
+                    nextNode.fromGains[tempGain] = {&edge};
                 }
             }
         }
     }
-    return gains;
 }
 
 float flow(std::vector<Node> inputs, float initialFlow) {
@@ -41,12 +34,12 @@ float flow(std::vector<Node> inputs, float initialFlow) {
     for(int index = 0; graph[index].size() > 0; ++index) {
         graph.emplace_back(std::set<int>());
         for(int id: graph[index]) {
-            int size = nodes[id].to.size();
-            for(int i = 0; i < size; ++i) {
-                if(used.find(nodes[id].to[i].to) != used.end()) return -1.0;
-                nodes[id].to[i].from = id;
-                graph[index + 1].insert(nodes[id].to[i].to);
-                nodes[nodes[id].to[i].to].from.insert(id);
+            Node& node = nodes[id];
+            for(Edge& edge: node.to) {
+                if(used.find(edge.to) != used.end()) return -1.0;
+                edge.from = id;
+                graph[index + 1].insert(edge.to);
+                nodes[edge.to].from.insert(id);
             }
         }
         used.insert(graph[index+1].begin(), graph[index+1].end());
@@ -54,8 +47,9 @@ float flow(std::vector<Node> inputs, float initialFlow) {
 
     graph.pop_back();
 
-    Node source = nodes[0];
-    auto gains = genGain(&nodes, graph);
+    Node& source = nodes[0];
+    source.currentGain = 1.0;
+    genGain(nodes, graph);
     Node sink = nodes[*((*(graph.rbegin())).begin())];
 
     int current = sink.id;
@@ -87,15 +81,10 @@ float flow(std::vector<Node> inputs, float initialFlow) {
     o.emplace_back(path);
     std::cout << o.at(0).dump() << std::endl;
 
-    /*
-    o.clear();
-    o.emplace_back(gains);
-    std::cout << o.at(0).dump() << std::endl;
-
     o.clear();
     o.emplace_back(nodes);
     std::cout << o.at(0).dump() << std::endl;
-     */
+
 
     return 5.0;
 }
